@@ -166,7 +166,7 @@ Phase 1: Database Design
 Confidence: 96%
 
 
-Phase 2: SSO Integration
+Phase 2: SSO Integration #ยังไม่ทำ
 ------------------------
 
 งานที่ต้องทำ:
