@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.env
+.env.local
+prototype
+design_handoff_inventory
+playwright-report
+test-results
+*.log
+README.md
+inventory-system-plan.txt

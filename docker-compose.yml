@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: stock-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - SSO_JWKS_URL=${SSO_JWKS_URL}
+      - SSO_ISSUER=${SSO_ISSUER}
+      - SSO_AUDIENCE=${SSO_AUDIENCE}
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped

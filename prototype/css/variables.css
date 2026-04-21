@@ -1,0 +1,77 @@
+:root {
+  --bg-canvas: #0b1628;
+  --bg-guild: #091221;
+  --bg-sidebar: #0d1a30;
+  --bg-main: #0b1628;
+  --bg-surface: #101f3a;
+  --bg-elevated: #152444;
+  --bg-hover: #1a2d54;
+  --bg-soft: #101f3a;
+  --text: #dde6f5;
+  --text-muted: #8aa0c2;
+  --text-dim: #6b84aa;
+  --line: #1e3460;
+  --line-soft: #1e3460;
+  --brand: #2dd4bf;
+  --brand-hover: #14b8a6;
+  --brand-soft: rgba(45, 212, 191, 0.14);
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --shadow-strong: 0 18px 38px rgba(0, 0, 0, 0.34);
+  --radius-xl: 18px;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 8px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  min-height: 100%;
+  color: var(--text);
+  font-family: "IBM Plex Sans Thai", "Inter", -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg-canvas);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(45, 212, 191, 0.28);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #1a1b1f;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #111214;
+}

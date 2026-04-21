@@ -1,0 +1,391 @@
+แผนระบบ Inventory / Stock Production
+=====================================
+
+แนวทางนี้ตัด Sentry ออกจากเฟสแรก, ไม่ทำระบบ Auth เอง, ใช้ SSO จากระบบหลัก, ใช้ Docker Desktop สำหรับรันแอป และใช้ Neon Postgres Cloud เป็นฐานข้อมูล
+
+
+ระบบที่ต้องใช้
+---------------
+
+1. Next.js
+   ใช้สำหรับ:
+   - ทำ web app หลัก
+   - ทำหน้า Dashboard, วัสดุ, ครุภัณฑ์, ผู้ขาย, Movement, Report
+   - ทำ API ภายในด้วย Route Handlers
+
+2. TypeScript
+   ใช้สำหรับ:
+   - บังคับ type ของข้อมูล
+   - ลด bug จาก field ผิด เช่น qty, unitPrice, warehouseId
+   - ทำให้ schema, form, API และ business logic ตรวจสอบได้ง่ายขึ้น
+
+3. Bun
+   ใช้สำหรับ:
+   - package manager
+   - run dev server
+   - run script เช่น migrate, seed, test
+
+4. Docker Desktop
+   ใช้สำหรับ:
+   - รัน Next.js app ใน container
+   - ทำ environment ให้เหมือนกันทุกเครื่อง
+   - ไม่ต้องติดตั้ง runtime หลายอย่างบนเครื่องโดยตรง
+
+5. Neon Postgres Cloud
+   ใช้สำหรับ:
+   - เก็บข้อมูลจริงของระบบ
+   - ใช้ database branch สำหรับ dev, staging, production
+   - ไม่ต้องลง Postgres ในเครื่อง
+
+6. Drizzle ORM
+   ใช้สำหรับ:
+   - เขียน schema database
+   - query database แบบ type-safe
+   - ทำ transaction สำคัญ เช่น รับเข้า, เบิกออก, โอนย้าย
+
+7. drizzle-kit
+   ใช้สำหรับ:
+   - generate migration
+   - apply migration ไป Neon
+   - คุม version ของ database schema
+
+8. shadcn/ui
+   ใช้สำหรับ:
+   - component UI เช่น Button, Dialog, Table, Form, Select, Tabs, Badge
+   - ทำหน้าระบบให้ดูเป็น production app ได้เร็ว
+
+9. Tailwind CSS
+   ใช้สำหรับ:
+   - styling
+   - layout
+   - responsive UI
+
+10. Zod
+    ใช้สำหรับ:
+    - validate input ฝั่ง server
+    - validate form data
+    - validate SSO payload
+
+11. react-hook-form
+    ใช้สำหรับ:
+    - จัดการ form
+    - แสดง error state
+    - จัดการ submit state
+    - ทำงานร่วมกับ Zod
+
+12. TanStack Table
+    ใช้สำหรับ:
+    - table ระดับ production
+    - sort
+    - filter
+    - pagination
+    - column visibility
+
+13. jose
+    ใช้สำหรับ:
+    - verify JWT/JWKS จากระบบหลัก ถ้า SSO ใช้ token
+    - ถ้า SSO ไม่ใช่ JWT ต้องปรับตามรูปแบบของระบบหลัก
+
+14. Playwright
+    ใช้สำหรับ:
+    - end-to-end test
+    - ทดสอบ flow เช่น เพิ่มวัสดุ, รับเข้า, เบิกออก, ห้ามเบิกเกิน
+
+15. Vitest
+    ใช้สำหรับ:
+    - unit test business logic
+    - test stock calculation
+    - test alert rules
+    - test validation
+
+
+สิ่งที่ยังไม่ใช้ในเฟสแรก
+------------------------
+
+- ElysiaJS
+- Sentry
+- Postgres local
+- Auth.js
+- Clerk
+
+เหตุผล:
+- ระบบเป็น internal web app ก่อน จึงใช้ Next.js Route Handlers ได้พอ
+- ไม่ทำ auth เอง เพราะใช้ SSO จากระบบหลัก
+- ไม่ใช้ Postgres local เพราะใช้ Neon Cloud โดยตรง
+- Sentry ค่อยเพิ่มก่อน production หรือหลัง production เมื่อจำเป็น
+- ElysiaJS ค่อยเพิ่มเมื่อมี API boundary จริง เช่น mobile app, third-party API, webhook หรือ service แยก
+
+
+Phase การทำงาน
+---------------
+
+Phase 0: Setup Project
+----------------------
+
+งานที่ต้องทำ:
+- สร้าง Next.js project
+- เปิด TypeScript strict
+- ตั้งค่า Bun
+- ตั้งค่า Dockerfile และ docker-compose
+- ตั้งค่า env
+- ติดตั้ง shadcn/ui
+- ติดตั้ง Drizzle, Zod, react-hook-form, TanStack Table, jose
+
+ผลลัพธ์:
+- รันระบบได้ผ่าน Docker
+- เปิดหน้าแรกได้
+- ต่อ Neon dev database ได้
+
+Confidence: 97%
+
+
+Phase 1: Database Design
+------------------------
+
+งานที่ต้องทำ:
+- ออกแบบ schema
+- สร้าง migration
+- apply migration ไป Neon dev branch
+
+ตารางหลัก:
+- sso_users
+- suppliers
+- warehouses
+- locations
+- materials
+- assets
+- stock_movements
+- stock_balances
+- audit_logs
+
+ผลลัพธ์:
+- database พร้อมใช้งาน
+- schema อยู่ใน code
+- migration reproducible
+
+Confidence: 96%
+
+
+Phase 2: SSO Integration
+------------------------
+
+งานที่ต้องทำ:
+- ทำ middleware รับ user จากระบบหลัก
+- verify token/session
+- map user เข้า sso_users
+- map role/permission
+- block request ที่ไม่มี SSO context
+
+ผลลัพธ์:
+- รู้ว่า user คือใคร
+- ทุก mutation ผูกกับ user ได้
+
+Confidence: 94%
+Manual Override Required for SSO token/session format scenario.
+
+
+Phase 3: Core Master Data
+-------------------------
+
+ทำหน้าและ API สำหรับ:
+- วัสดุ
+- ครุภัณฑ์
+- ผู้ขาย
+- คลัง
+- ตำแหน่งจัดเก็บ
+
+ฟีเจอร์:
+- create
+- edit
+- disable/archive
+- search
+- filter
+- pagination
+- validation
+- audit log
+
+ผลลัพธ์:
+- จัดการข้อมูลพื้นฐานได้จริง
+
+Confidence: 96%
+
+
+Phase 4: Stock Movement Ledger
+------------------------------
+
+ทำ transaction หลัก:
+- รับเข้า
+- เบิกออก
+- โอนย้าย
+- ปรับยอด
+
+logic สำคัญ:
+- รับเข้า -> เพิ่ม balance
+- เบิกออก -> เช็ค balance ก่อนลด
+- โอนย้าย -> ลดต้นทาง เพิ่มปลายทาง
+- ปรับยอด -> ต้องมี reason
+- ทุก action -> เขียน stock_movements และ audit_logs
+
+ผลลัพธ์:
+- stock ไม่ได้แก้ตัวเลขตรง ๆ
+- ทุกยอดมีที่มา
+
+Confidence: 95%
+
+
+Phase 5: Alerts
+---------------
+
+ทำ rule:
+- ของใกล้หมด
+- ของหมด
+- วันหมดอายุใกล้ถึง
+- หมดอายุแล้ว
+- ประกันครุภัณฑ์ใกล้หมด
+- ครุภัณฑ์รอซ่อม/ไม่พร้อมใช้
+
+ผลลัพธ์:
+- มี alert ใช้งานได้จากข้อมูลจริง
+
+Confidence: 90%
+Manual Override Required for reorder point and expiry policy scenario.
+
+
+Phase 6: Dashboard + Reports
+----------------------------
+
+ทำหน้า:
+- Dashboard
+- Stock summary
+- Movement report
+- Low stock report
+- Expiry report
+- Asset report
+- Supplier report
+
+ฟีเจอร์:
+- date range
+- filter warehouse/location
+- export CSV
+- print-friendly report
+
+ผลลัพธ์:
+- ผู้ใช้ดูภาพรวมและออกรายงานได้
+
+Confidence: 95%
+
+
+Phase 7: Testing
+----------------
+
+ทำ test:
+- unit test stock calculation
+- unit test validation
+- unit test alert rules
+- E2E test flow รับเข้า/เบิกออก/โอนย้าย
+- test ห้ามเบิกเกิน
+- test audit log ถูกสร้าง
+
+ผลลัพธ์:
+- logic สำคัญผ่าน test ก่อนขึ้นจริง
+
+Confidence: 95%
+
+
+Phase 8: Staging
+----------------
+
+งานที่ต้องทำ:
+- สร้าง Neon staging branch
+- deploy staging
+- ใช้ SSO staging
+- user acceptance test
+- ตรวจ permission
+- ตรวจ migration
+
+ผลลัพธ์:
+- ระบบพร้อมให้ user ทดลอง
+
+Confidence: 95%
+
+
+Phase 9: Production
+-------------------
+
+งานที่ต้องทำ:
+- สร้าง Neon production branch/database
+- ตั้งค่า env production
+- run migration
+- deploy production
+- ตรวจ backup/branch policy
+- freeze schema version แรก
+
+ผลลัพธ์:
+- ขึ้นระบบจริงได้
+
+Confidence: 95%
+
+
+Phase 10: หลังขึ้นจริง
+----------------------
+
+งานที่อาจทำเพิ่ม:
+- เก็บ feedback
+- เพิ่ม export Excel/PDF ถ้าต้องการ
+- เพิ่ม Sentry/log monitoring ถ้า error เริ่มตามยาก
+- พิจารณา ElysiaJS ถ้าต้องแยก API ให้ระบบอื่น
+
+
+สรุปเส้นทางการพัฒนา
+--------------------
+
+Prototype HTML
+-> Next.js production app
+-> Neon schema
+-> SSO
+-> Master data
+-> Stock ledger
+-> Alerts
+-> Reports
+-> Tests
+-> Staging
+-> Production
+
+
+Stack สุดท้ายที่แนะนำ
+---------------------
+
+- Next.js
+- TypeScript
+- Bun
+- Docker Desktop
+- Neon Postgres Cloud
+- Drizzle ORM
+- drizzle-kit
+- shadcn/ui
+- Tailwind CSS
+- Zod
+- react-hook-form
+- TanStack Table
+- jose
+- Playwright
+- Vitest
+
+
+หมายเหตุสำคัญ
+-------------
+
+1. Audit log จำเป็นตั้งแต่วันแรก
+   ต้องเก็บว่าใครทำอะไร, ก่อนหน้าเป็นอะไร, หลังจากเป็นอะไร, เวลาไหน, และมาจาก SSO user id ไหน
+
+2. Stock balance ไม่ควรแก้ตัวเลขโดยตรง
+   ควรมาจาก stock movement ledger เพื่อให้ตรวจสอบย้อนหลังได้
+
+3. ห้ามใช้ dummy API ใน production
+   ข้อมูล production ต้องมาจาก Neon และ API ของระบบจริงเท่านั้น
+
+4. SSO ต้อง verify ทุก request สำคัญ
+   ไม่ควรเชื่อข้อมูล user จาก client โดยตรง
+
+5. Reorder point, expiry policy, warranty policy ต้องให้ผู้ใช้งานหรือเจ้าของระบบกำหนด
+   Manual Override Required for these policy scenarios.

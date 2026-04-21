@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="channels-header">
+        <strong>📦 กองคลัง</strong>
+        <span>▾</span>
+      </div>
+
+      <div class="nav-block">
+        <p class="nav-label">STOCK</p>
+        <div class="nav">
+          <div class="nav-item active" data-tab="goods" role="button" tabindex="0"><span>#</span><span>รายการวัสดุ</span></div>
+          <div class="nav-item" data-tab="assets" role="button" tabindex="0"><span>#</span><span>รายการครุภัณฑ์</span></div>
+        </div>
+      </div>
+
+      <div class="nav-block">
+        <p class="nav-label">Supplier</p>
+        <div class="nav">
+          <div class="nav-item" data-tab="supplier" role="button" tabindex="0"><span>#</span><span>รายการผู้ขาย</span></div>
+        </div>
+      </div>
+
+      <div class="nav-block">
+        <p class="nav-label">Notifications</p>
+        <div class="nav">
+          <div class="nav-item" data-tab="alerts" role="button" tabindex="0"><span>#</span><span>การแจ้งเตือน</span></div>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-panel">
+          <div class="user-avatar">ST</div>
+          <div class="user-meta">
+            <strong>StorageBot</strong>
+            <span>local file runtime</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="breadcrumb-bar">
+        <div class="header-primary">
+          <div class="header-title">
+            <span class="header-hash">#</span>
+            <span id="breadcrumb">คลัง / ข้อมูลวัสดุ</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <section class="stat-strip" id="statStrip"></section>
+
+        <section class="surface data-surface">
+          <div class="surface-header">
+            <div>
+              <p class="eyebrow">Inventory</p>
+              <h4 id="listTitle">รายการวัสดุ</h4>
+              <p class="section-kicker" id="listKicker">ตารางข้อมูลรายการในคลัง</p>
+            </div>
+            <div class="surface-controls">
+              <div class="toolbar-actions">
+                <button class="ghost-button" type="button" id="reloadDataButton">รีโหลด API</button>
+                <button class="primary-button" type="button" id="openModalButton">+ เพิ่มรายการ</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <div class="search-field">
+              <span class="search-icon">⌕</span>
+              <input type="search" id="searchInput" placeholder="ค้นหารหัส, ชื่อ, Serial...">
+            </div>
+            <div class="feed-controls">
+              <label for="categoryFilter">Category</label>
+              <select id="categoryFilter" aria-label="Category filter" disabled>
+                <option value="all">ทุกหมวด</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="data-layout">
+            <div class="table-shell" id="historyTable"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="detailBackdrop" aria-hidden="true">
+    <div class="modal-panel detail-modal-panel" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+      <div id="detailModalPanel"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow" id="modalEyebrow">Material Record</p>
+          <h3 id="modalTitle">เพิ่มข้อมูลวัสดุ</h3>
+        </div>
+        <button class="ghost-button" type="button" id="closeModalButton">ปิด</button>
+      </div>
+
+      <form class="modal-form" id="goodsForm">
+        <div class="field">
+          <label for="goodsDate">วันที่รับเข้า</label>
+          <input type="date" id="goodsDate">
+        </div>
+        <div class="field">
+          <label for="goodsRef">เลขอ้างอิง</label>
+          <input type="text" id="goodsRef" placeholder="GR-240420-001">
+        </div>
+        <div class="field">
+          <label for="goodsSupplier">ผู้ขาย</label>
+          <select id="goodsSupplier"></select>
+        </div>
+        <div class="field">
+          <label for="goodsItem">รายการ</label>
+          <select id="goodsItem"></select>
+        </div>
+        <div class="field">
+          <label for="goodsCategory">หมวด</label>
+          <input type="text" id="goodsCategory" readonly>
+        </div>
+        <div class="field">
+          <label for="goodsUnit">หน่วยนับ</label>
+          <input type="text" id="goodsUnit" readonly>
+        </div>
+        <div class="field">
+          <label for="goodsWarehouse">คลัง</label>
+          <select id="goodsWarehouse"></select>
+        </div>
+        <div class="field">
+          <label for="goodsLocation">ตำแหน่งจัดเก็บ</label>
+          <select id="goodsLocation"></select>
+        </div>
+        <div class="field">
+          <label for="goodsQty">จำนวน</label>
+          <input type="number" id="goodsQty" min="0" value="0">
+        </div>
+        <div class="field">
+          <label for="goodsUnitPrice">ราคา/หน่วย</label>
+          <input type="number" id="goodsUnitPrice" min="0" value="0">
+        </div>
+        <div class="field">
+          <label for="goodsLot">Lot</label>
+          <input type="text" id="goodsLot" placeholder="LOT-2026-001">
+        </div>
+        <div class="field">
+          <label for="goodsExpiry">วันหมดอายุ</label>
+          <input type="date" id="goodsExpiry">
+        </div>
+        <div class="field">
+          <label for="goodsSource">ที่มา</label>
+          <select id="goodsSource"></select>
+        </div>
+        <div class="field full">
+          <label for="goodsNote">หมายเหตุ</label>
+          <textarea id="goodsNote" rows="3" placeholder="รายละเอียดการรับเข้าหรือเงื่อนไขการใช้งาน"></textarea>
+        </div>
+        <div class="field full">
+          <label for="goodsImage">รูปภาพสิ่งของ</label>
+          <input type="file" id="goodsImage" accept="image/png,image/jpeg,image/webp,image/gif">
+          <small class="field-hint">รองรับ PNG/JPG/WEBP/GIF ขนาดไม่เกิน 2MB</small>
+        </div>
+        <div class="upload-preview full" id="goodsImagePreview"></div>
+        <div class="movement-preview full" id="goodsPreview"></div>
+        <div class="form-actions full">
+          <button class="ghost-button" type="button" id="cancelGoodsButton">ยกเลิก</button>
+          <button class="primary-button" type="button" id="saveGoodsButton">บันทึกรับเข้าสิ่งของ</button>
+        </div>
+      </form>
+
+      <form class="modal-form" id="assetsForm">
+        <div class="field">
+          <label for="assetDate">วันที่รับเข้า</label>
+          <input type="date" id="assetDate">
+        </div>
+        <div class="field">
+          <label for="assetCode">เลขทะเบียน</label>
+          <input type="text" id="assetCode" placeholder="AST-240420-001">
+        </div>
+        <div class="field">
+          <label for="assetSupplier">ผู้ขาย</label>
+          <select id="assetSupplier"></select>
+        </div>
+        <div class="field">
+          <label for="assetName">ชื่อครุภัณฑ์</label>
+          <input type="text" id="assetName" placeholder="เช่น Laptop Dell Latitude">
+        </div>
+        <div class="field">
+          <label for="assetSerial">Serial</label>
+          <input type="text" id="assetSerial" placeholder="SN-XXXXX">
+        </div>
+        <div class="field">
+          <label for="assetCategory">หมวด</label>
+          <input type="text" id="assetCategory" placeholder="เช่น laptops, furniture">
+        </div>
+        <div class="field">
+          <label for="assetWarehouse">คลัง</label>
+          <select id="assetWarehouse"></select>
+        </div>
+        <div class="field">
+          <label for="assetLocation">ตำแหน่งจัดเก็บ</label>
+          <select id="assetLocation"></select>
+        </div>
+        <div class="field">
+          <label for="assetValue">มูลค่า</label>
+          <input type="number" id="assetValue" min="0" value="0">
+        </div>
+        <div class="field">
+          <label for="assetLifespan">อายุใช้งาน (ปี)</label>
+          <input type="number" id="assetLifespan" min="0" value="5">
+        </div>
+        <div class="field">
+          <label for="assetWarranty">หมดประกัน</label>
+          <input type="date" id="assetWarranty">
+        </div>
+        <div class="field">
+          <label for="assetStatus">สถานะ</label>
+          <select id="assetStatus">
+            <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+            <option value="เก็บในคลัง">เก็บในคลัง</option>
+            <option value="รอตรวจรับ">รอตรวจรับ</option>
+            <option value="ส่งซ่อม">ส่งซ่อม</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="assetImage">รูปภาพครุภัณฑ์</label>
+          <input type="file" id="assetImage" accept="image/png,image/jpeg,image/webp,image/gif">
+          <small class="field-hint">รองรับ PNG/JPG/WEBP/GIF ขนาดไม่เกิน 2MB</small>
+        </div>
+        <div class="upload-preview full" id="assetImagePreview"></div>
+        <div class="movement-preview full" id="assetPreview"></div>
+        <div class="form-actions full">
+          <button class="ghost-button" type="button" id="cancelAssetButton">ยกเลิก</button>
+          <button class="primary-button" type="button" id="saveAssetButton">บันทึกครุภัณฑ์</button>
+        </div>
+      </form>
+
+      <form class="modal-form" id="supplierForm">
+        <div class="field">
+          <label for="supplierDate">วันที่เพิ่ม</label>
+          <input type="date" id="supplierDate">
+        </div>
+        <div class="field">
+          <label for="supplierRef">รหัสผู้ขาย</label>
+          <input type="text" id="supplierRef" placeholder="SUP-240420-001">
+        </div>
+        <div class="field full">
+          <label for="supplierName">ชื่อบริษัท</label>
+          <input type="text" id="supplierName" placeholder="ABC Office Supplies Co., Ltd.">
+        </div>
+        <div class="field">
+          <label for="supplierContact">ผู้ติดต่อ</label>
+          <input type="text" id="supplierContact" placeholder="ชื่อผู้ประสานงาน">
+        </div>
+        <div class="field">
+          <label for="supplierPhone">เบอร์โทร</label>
+          <input type="tel" id="supplierPhone" placeholder="02-123-4567">
+        </div>
+        <div class="field">
+          <label for="supplierEmail">อีเมล</label>
+          <input type="email" id="supplierEmail" placeholder="sales@example.com">
+        </div>
+        <div class="movement-preview full" id="supplierPreview"></div>
+        <div class="form-actions full">
+          <button class="ghost-button" type="button" id="cancelSupplierButton">ยกเลิก</button>
+          <button class="primary-button" type="button" id="saveSupplierButton">บันทึกผู้ขาย</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">พร้อมใช้งาน</div>
+
+  <script src="js/data.js" defer></script>
+  <script src="js/state.js" defer></script>
+  <script src="js/api.js" defer></script>
+  <script src="js/alerts.js" defer></script>
+  <script src="js/ui/render.js" defer></script>
+  <script src="js/ui/modal.js" defer></script>
+  <script src="js/ui/tabs.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

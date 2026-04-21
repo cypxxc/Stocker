@@ -1,0 +1,119 @@
+.app-shell {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  height: 100vh;
+  background: var(--bg-canvas);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg-sidebar);
+  border-right: 1px solid rgba(0, 0, 0, 0.28);
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg-main);
+}
+
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 56px;
+  padding: 0 20px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.22);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.main-content {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+  overflow: auto;
+  min-height: 0;
+}
+
+.surface {
+  position: relative;
+  padding: 14px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-surface) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.data-surface {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.data-surface .table-shell {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 1080px) {
+  .app-shell {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 920px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-shell {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .breadcrumb-bar {
+    padding: 14px 16px;
+  }
+
+  .main-content {
+    padding: 16px;
+  }
+
+  .surface-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 720px) {
+  .breadcrumb-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .main-content {
+    padding: 14px;
+    gap: 14px;
+  }
+}

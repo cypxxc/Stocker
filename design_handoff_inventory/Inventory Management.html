@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InvenThai — ระบบบริหารคลังพัสดุ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { height: 100%; }
+  body { background: #0b1628; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1e3460; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2dd4bf50; }
+  input, select, button { font-family: "IBM Plex Sans Thai", "Inter", sans-serif; }
+  input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
+  select option { background: #152444; color: #dde6f5; }
+  * { -webkit-font-smoothing: antialiased; }
+  /* Hover states via CSS since React inline styles can't do :hover */
+  tr:hover td { background: rgba(45,212,191,0.04) !important; }
+  button:hover:not(:disabled) { filter: brightness(1.12); }
+
+  @media print {
+    body { background: #fff !important; }
+    #app-sidebar,
+    #app-topbar {
+      display: none !important;
+    }
+    #app-shell,
+    #app-content,
+    #reports-root {
+      display: block !important;
+      width: 100% !important;
+      height: auto !important;
+      overflow: visible !important;
+      padding: 0 !important;
+      color: #111 !important;
+      background: #fff !important;
+    }
+    #reports-root button,
+    #reports-root input,
+    #reports-root select {
+      display: none !important;
+    }
+    #reports-root table,
+    #reports-root th,
+    #reports-root td {
+      color: #111 !important;
+      border-color: #bbb !important;
+      background: #fff !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Load order: data → icons → ui → views → app -->
+<script src="src/data.js"></script>
+<script src="src/dataService.js"></script>
+<script type="text/babel" src="src/icons.jsx"></script>
+<script type="text/babel" src="src/ui.jsx"></script>
+<script type="text/babel" src="src/Dashboard.jsx"></script>
+<script type="text/babel" src="src/Materials.jsx"></script>
+<script type="text/babel" src="src/Equipment.jsx"></script>
+<script type="text/babel" src="src/Suppliers.jsx"></script>
+<script type="text/babel" src="src/Movement.jsx"></script>
+<script type="text/babel" src="src/Reports.jsx"></script>
+<script type="text/babel" src="src/App.jsx"></script>
+</body>
+</html>
